@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+env/
+*.egg-info/
+
+# Streamlit local secrets and runtime
+.streamlit/secrets.toml
+.streamlit/credentials.toml
+
+# Environment and local files
+.env
+.env.*
+!.env.example
+.DS_Store
+.ipynb_checkpoints/
+*.log
+tmp/
+temp/
+
+# Research datasets and model artifacts: review explicitly before publishing
+data/
+datasets/
+private_data/
+*.pkl
+*.pickle
+*.joblib
+*.parquet
+*.h5
+*.hdf5
