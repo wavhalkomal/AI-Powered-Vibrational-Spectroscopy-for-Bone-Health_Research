@@ -7396,13 +7396,13 @@ st.sidebar.markdown("---")
 show_professor_panel = st.sidebar.checkbox(
     "🧪 Sample-ID Grouped Cross-Validation",
     value=False,
-    help="Reviewer-requested validation: 250 spectra per Sample ID + Leave-One-Group-Out CV grouped by Sample ID.",
+    help="Leave-One-Group-Out cross-validation by Sample ID; configurable spectra per group (default 250).",
 )
 
 if show_professor_panel:
     st.markdown("---")
     st.header("🧪 Sample-ID Grouped Leave-One-Group-Out Validation")
-    st.caption("Testing on professor's request")
+    st.caption("Independent-sample validation with Leave-One-Group-Out cross-validation")
 
     with st.expander("Why this section exists / methodology", expanded=False):
         st.markdown(
@@ -9460,27 +9460,27 @@ if show_professor_panel:
                 _pv_col1, _pv_col2, _pv_col3 = st.columns(3)
                 with _pv_col1:
                     st.download_button(
-                        "📥 Download Accuracy_Table_Filled.xlsx", data=st.session_state["pv_accuracy_xlsx"],
-                        file_name=f"Accuracy_Table_Filled_{_pv_run_ts}.xlsx",
+                        "📥 Download validation accuracy summary", data=st.session_state["pv_accuracy_xlsx"],
+                        file_name=f"Grouped_Validation_Accuracy_{_pv_run_ts}.xlsx",
                         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                         key="pv_dl1"
                     )
                 with _pv_col2:
                     st.download_button(
-                        "📥 Download Accuracy_Table_Detailed_Results.xlsx", data=st.session_state["pv_detailed_xlsx"],
-                        file_name=f"Accuracy_Table_Detailed_Results_{_pv_run_ts}.xlsx",
+                        "📥 Download detailed validation results", data=st.session_state["pv_detailed_xlsx"],
+                        file_name=f"Grouped_Validation_Detailed_Results_{_pv_run_ts}.xlsx",
                         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                         key="pv_dl2"
                     )
                 with _pv_col3:
                     st.download_button(
-                        "📥 Download Grouped_Validation_Comparison.xlsx", data=st.session_state["pv_comparison_xlsx"],
+                        "📥 Download model comparison workbook", data=st.session_state["pv_comparison_xlsx"],
                         file_name=f"Grouped_Validation_Comparison_{_pv_run_ts}.xlsx",
                         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                         key="pv_dl3"
                     )
 
-                st.success("Use the first file's numbers to update the manuscript table. The third file is the full Old-vs-New, per-group breakdown ready to share with your professor.")
+                st.success("Download the summary, detailed results, and model-comparison workbooks for reproducible analysis.")
 
                 # ──────────────────────────────────────────────────────────────
                 # Publication-ready figures using the exact same balanced data.
@@ -9608,7 +9608,7 @@ if show_professor_panel:
                 _pv_models_for_combo = list(_pv_all_results[_pv_selected_combo].keys())
                 _pv_fig_models = st.multiselect(
                     "Models for LOGO confusion matrices and per-group accuracy "
-                    "(all selected by default, as the professor asked for all models)",
+                    "(all available models selected by default)",
                     _pv_models_for_combo,
                     default=_pv_models_for_combo,      # Every model, matching the 9 Jan 2026 request
                     key="pv_figure_models",
@@ -11104,9 +11104,9 @@ if _zs_show:                                     # Everything below runs only wh
                                       "sheet does not apply.")
         _zs_n = int(st.number_input(
             "Training spectra per sample group", 50, 2000, 250, 50, key="zs_n",
-            help="The balanced design from the 1 June 2026 request. Each model is trained on "
-                 "this many spectra from each of the 11 training animals in every fold. Leave "
-                 "at 250 to match the accuracy table and every other result in the paper."))
+            help="Each model is trained on "
+                 "this many spectra per training sample group in each fold. Choose "
+                 "a value appropriate for the dataset and available compute."))
         _zs_seed = int(st.number_input("Random seed", 0, 10000, 42, 1, key="zs_seed"))
         _zs_method = st.radio("Method",
                               ["B - Zone perturbation (paper's method)",
@@ -11123,12 +11123,12 @@ if _zs_show:                                     # Everything below runs only wh
         _zs_editable = st.checkbox("Also export editable full-spectrum SHAP tables", value=True,
                                    key="zs_editable",
                                    help="SHAP value at EVERY wavenumber 1800-800, not a top-20 "
-                                        "list - what Prof. Querido asked for on the call.")
+                                        "list, suitable for downstream analysis.")
         _zs_pick = st.multiselect("Models", list(_zs_models(_zs_seed).keys()),
                                   default=list(_zs_models(_zs_seed).keys())[:1], key="zs_models")
         _zs_go = st.button("▶️ Run zone analysis", type="primary", key="zs_go")
-        st.caption("**Two different numbers.** *Spectra per animal* = the professor's balanced "
-                   "250, used to TRAIN. *Spectra explained* = how many held-out spectra get a "
+        st.caption("**Two different settings.** *Training spectra per group* = "
+                   "the number used for training. *Spectra explained* = how many held-out spectra get a "
                    "SHAP explanation. Changing the second never changes a model or an accuracy.")
 
     if not _zs_go:                               # Idle state: show the zone table, not a blank page
@@ -11136,7 +11136,7 @@ if _zs_show:                                     # Everything below runs only wh
         st.subheader("Zone definitions")         # Section heading
         st.dataframe(_zs_zone_table(_n0, _i0), width="stretch", hide_index=True)
         st.caption("Overlapping endpoints (1600, 1430, 1200, 1100) are assigned to the first "
-                   "zone in the professor's listed order. Channels in no zone are collected as "
+                   "zone in the defined priority order. Channels in no zone are collected as "
                    "'Unassigned (gaps)' so contributions still reconcile to the model output.")
         st.info("Upload the dataset and press **Run zone analysis**.", icon="👈")
     elif _zs_up is None:                         # Cannot proceed without data
@@ -11258,7 +11258,7 @@ if _zs_show:                                     # Everything below runs only wh
                               else "Zone-aggregated per-wavenumber SHAP", _zs_cap,
                               "Contreras et al., Anal. Chem. 2024, 96(39), 15588-15597; "
                               "DOI 10.1021/acs.analchem.4c02329",
-                              "First matching zone in the professor's listed order wins; "
+                              "First matching zone in the defined priority order wins; "
                               "channels in no zone are collected as 'Unassigned (gaps)'",
                               "SHAP value at every wavenumber 1800-800, plus waterfall values"],
                 }).to_excel(_xw, sheet_name="README", index=False)
@@ -11636,7 +11636,7 @@ if _q2a_show:
         _q2a_up = st.file_uploader("Dataset (.xlsx)", type=["xlsx"], key="q2a_up")
         _q2a_n = int(st.number_input("Spectra per animal", 50, 2000, 250, 50, key="q2a_n"))
         _q2a_seed = int(st.number_input("Random seed", 0, 10000, 42, 1, key="q2a_seed"))
-        _q2a_go = st.button("▶️ Generate Fig 2a", type="primary", key="q2a_go")
+        _q2a_go = st.button("▶️ Generate peak-ratio analysis", type="primary", key="q2a_go")
 
     if _q2a_go and _q2a_up is not None:
         _q2a_tmp = os.path.join(".", "_q2a_upload.xlsx")        # Loader needs a real path
@@ -11832,13 +11832,13 @@ if _q2a_show:
         with _qc1:
             st.download_button("📥 Data + statistics (editable .xlsx)",
                                data=_q2a_saved["xlsx"],
-                               file_name=f"Fig2a_PeakRatios_{_q2a_saved['stamp']}.xlsx",
+                               file_name=f"Peak_Ratio_Analysis_{_q2a_saved['stamp']}.xlsx",
                                mime="application/vnd.openxmlformats-officedocument."
                                     "spreadsheetml.sheet",
                                key="q2a_dl_xlsx", use_container_width=True)
         with _qc2:
             st.download_button("📦 Figure (PNG + editable SVG)", data=_q2a_saved["zip"],
-                               file_name=f"Fig2a_PeakRatios_{_q2a_saved['stamp']}.zip",
+                               file_name=f"Peak_Ratio_Analysis_{_q2a_saved['stamp']}.zip",
                                mime="application/zip", key="q2a_dl_zip",
                                use_container_width=True)
         with _qc3:
