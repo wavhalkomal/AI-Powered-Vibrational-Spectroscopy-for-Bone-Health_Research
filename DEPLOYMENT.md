@@ -2,7 +2,7 @@
 
 ## App entrypoint
 
-`app_k_PROFESSOR_250_FULL_RESULTS_FINAL.py`
+`app.py`
 
 ## Local launch
 
@@ -10,7 +10,7 @@
 2. Create a virtual environment: `python3.11 -m venv .venv`
 3. Activate it: `source .venv/bin/activate` (Windows: `.venv\\Scripts\\activate`)
 4. Install dependencies: `python -m pip install -r requirements.txt`
-5. Launch: `streamlit run app_k_PROFESSOR_250_FULL_RESULTS_FINAL.py`
+5. Launch: `streamlit run app.py`
 
 ## Streamlit Community Cloud
 
@@ -18,7 +18,7 @@
 2. Choose **Create app** > **Deploy a public app from GitHub**.
 3. Repository: `wavhalkomal/AI-Powered-Vibrational-Spectroscopy-for-Bone-Health_Research`
 4. Branch: `main`
-5. Main file path: `app_k_PROFESSOR_250_FULL_RESULTS_FINAL.py`
+5. Main file path: `app.py`
 6. Deploy and inspect the build and application logs.
 7. Upload a **non-sensitive, approved sample dataset** to exercise each workflow. Validate model outputs against locally verified results.
 
