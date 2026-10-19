@@ -400,6 +400,47 @@ if st.session_state.get("method_panel_active", False):
 
 ############################################# [ Browse the file ] #############################################################################
 
+# User manual is a dedicated navigation page, independent of the analysis uploader.
+# Read the maintained documentation directly from the deployed repository.
+from pathlib import Path as _ManualPath
+_manual_file = _ManualPath(__file__).resolve().parent / "USER_GUIDE.md"
+
+if "page" not in st.session_state:
+    st.session_state.page = "home"
+
+with st.sidebar:
+    st.markdown("### 📘 Help & navigation")
+    if st.button("📘 User Manual", key="nav_user_manual", use_container_width=True):
+        st.session_state.page = "user_manual"
+        st.rerun()
+    if st.session_state.page == "user_manual":
+        if st.button("🔬 Start Analysis", key="nav_manual_analysis", use_container_width=True):
+            st.session_state.page = "analysis"
+            st.rerun()
+
+if st.session_state.page == "user_manual":
+    st.title("📘 BoneSpec AI — User Manual")
+    st.caption("Getting started · Excel input format · Grouped validation · Results and downloads")
+    _manual_left, _manual_right = st.columns([1, 1])
+    with _manual_left:
+        if st.button("← Back to Home", key="manual_back_home"):
+            st.session_state.page = "home"
+            st.rerun()
+    with _manual_right:
+        if st.button("Start Analysis →", key="manual_start_analysis", type="primary"):
+            st.session_state.page = "analysis"
+            st.rerun()
+    if _manual_file.is_file():
+        _manual_content = _manual_file.read_text(encoding="utf-8")
+        st.markdown(_manual_content)
+        st.download_button("📥 Download User Manual (.md)", _manual_content,
+                           file_name="BoneSpec_AI_User_Manual.md", mime="text/markdown")
+    else:
+        st.error("The user manual is not available in this deployment.")
+        st.markdown("[Read the manual on GitHub](https://github.com/wavhalkomal/bonespec-ai/blob/main/USER_GUIDE.md)")
+    # Do not execute heavy analysis modules while browsing documentation.
+    st.stop()
+
 # ======================= MAIN PAGE ==========================
 if "page" not in st.session_state:
     st.session_state.page = "home"
