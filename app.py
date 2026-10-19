@@ -143,7 +143,30 @@ def path_to_css_url(path: str, fallback_url: str) -> str:
         return fallback_url
 
 # Resolve hero + paper URLs (local or fallback)
-hero_url = path_to_css_url(HERO_DEFAULT, HERO_FALLBACK_URL)
+# Locate the uploaded hero asset even when GitHub stores it in an assets folder
+# or the filename uses different capitalization. Preserve the original fallback.
+def _find_bonespec_hero():
+    import pathlib
+    root = pathlib.Path(__file__).resolve().parent
+    preferred = [root / "Background_1.jpg", root / "assets" / "Background_1.jpg",
+                 root / "assets" / "hero.jpg"]
+    for candidate in preferred:
+        if candidate.is_file():
+            return str(candidate)
+    for folder in (root, root / "assets", root / "images"):
+        if folder.is_dir():
+            for candidate in folder.iterdir():
+                if candidate.is_file() and candidate.name.casefold() in (
+                    "background_1.jpg", "background_1.jpeg", "background_1.png",
+                    "background_1.webp", "hero.jpg", "hero.png"):
+                    return str(candidate)
+    return None
+
+_hero_asset = _find_bonespec_hero()
+if _hero_asset is None:
+    st.warning("BoneSpec AI background image is missing from the deployed repository. "
+               "Upload Background_1.jpg alongside app.py (or into assets/) on the main branch.")
+hero_url = path_to_css_url(_hero_asset, HERO_FALLBACK_URL) if _hero_asset else HERO_FALLBACK_URL
 paper_url = path_to_css_url(PAPER_IMAGE_PATH, PAPER_FALLBACK_URL)
 
 # -------------------- Accent map --------------------
