@@ -167,7 +167,9 @@ _hero_asset = _find_bonespec_hero()
 # User-selected remote DNA background: use directly rather than requiring a GitHub image upload.
 # Previous DNA background (kept for future reference):
 # https://png.pngtree.com/thumb_back/fw800/background/20260620/pngtree-abstract-blue-digital-dna-strand-medical-technology-background-image_21942756.webp
-hero_url = "https://www.shutterstock.com/image-vector/futuristic-medical-cybernetic-robotics-technology-260nw-2262212371.jpg"
+# Alternative background retained for future reference:
+# https://www.shutterstock.com/image-vector/futuristic-medical-cybernetic-robotics-technology-260nw-2262212371.jpg
+hero_url = "https://png.pngtree.com/thumb_back/fw800/background/20260620/pngtree-abstract-blue-digital-dna-strand-medical-technology-background-image_21942756.webp"
 paper_url = path_to_css_url(PAPER_IMAGE_PATH, PAPER_FALLBACK_URL)
 
 # -------------------- Accent map --------------------
