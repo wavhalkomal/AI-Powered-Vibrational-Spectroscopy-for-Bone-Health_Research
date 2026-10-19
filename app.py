@@ -79,7 +79,7 @@ import plotly.graph_objects as go
 
 # -------------------- Page config --------------------•
 st.set_page_config(
-    page_title="AI-Powered Vibrational Spectroscopy for Bone Health Analysis ",
+    page_title="AI-Powered Infrared Spectral Analysis of Bone",
     page_icon="🧬",
     layout="wide"
 )
@@ -165,7 +165,9 @@ def _find_bonespec_hero():
 _hero_asset = _find_bonespec_hero()
 
 # User-selected remote DNA background: use directly rather than requiring a GitHub image upload.
-hero_url = "https://png.pngtree.com/thumb_back/fw800/background/20260620/pngtree-abstract-blue-digital-dna-strand-medical-technology-background-image_21942756.webp"
+# Previous DNA background (kept for future reference):
+# https://png.pngtree.com/thumb_back/fw800/background/20260620/pngtree-abstract-blue-digital-dna-strand-medical-technology-background-image_21942756.webp
+hero_url = "https://www.shutterstock.com/image-vector/futuristic-medical-cybernetic-robotics-technology-260nw-2262212371.jpg"
 paper_url = path_to_css_url(PAPER_IMAGE_PATH, PAPER_FALLBACK_URL)
 
 # -------------------- Accent map --------------------
@@ -276,7 +278,7 @@ def inject_shell():
     place-items: center;
   }}
  
-  .hero h1 {{ color: white; text-shadow: 0 10px 30px rgba(0,0,0,.40); font-size: 56px; margin: 0; }}
+  .hero h1 {{ color: white; text-shadow: 0 10px 30px rgba(0,0,0,.40); font-size: clamp(2.6rem, 5vw, 5.4rem); font-weight: 900; line-height: 1.08; letter-spacing: -1.5px; max-width: 1100px; margin: 0 auto; }}
   .hero p {{ color: #eef2ff; margin-top: 10px; font-weight: 600; letter-spacing:.2px; }}
 
   /* Floating Back-to-Top */
@@ -319,7 +321,7 @@ def inject_shell():
   
 <div id="top" class="sticky-nav">
   <div class="nav-wrap">
-    <span class="brand">🤖 ML Studio</span>
+    <span class="brand">🔬 BoneSpec AI</span>
     <a class="nav-btn" href="#data">Data</a>
     <a class="nav-btn" href="#preprocess">Preprocess</a>
     <a class="nav-btn" href="#train">Train</a>
@@ -331,9 +333,9 @@ def inject_shell():
  
 <div class="hero">
   <div style="text-align:center">
-    <h1 id="hero-title">🧬 AI-Powered Vibrational Spectroscopy <br>for Bone Health</h1>
+    <h1 id="hero-title">AI-Powered Infrared<br>Spectral Analysis of Bone</h1>
     <br><br> 
-    <p>• 🔬Bone Spectral Classification and Composition Analysis Workspace</p>
+    <p>Infrared spectroscopy · Machine learning · Interpretable spectral analysis</p>
   </div>
 </div>
  
@@ -431,7 +433,34 @@ elif st.session_state.page == "analysis":
 
     ####################################### [ Upload the document ] #######################################
 
-    uploaded_file = st.file_uploader(f"**Upload FTIR Excel file**", type=["xlsx"])  # File uploader for FTIR data
+    # Add only a professor-approved shareable example at sample_data/bone_spectra_example.xlsx.
+    import io as _example_io
+    from pathlib import Path as _ExamplePath
+    _example_path = _ExamplePath(__file__).resolve().parent / "sample_data" / "bone_spectra_example.xlsx"
+    with st.expander("📘 User guide — getting started and Excel format", expanded=True):
+        st.markdown("""
+**1. Choose your data.** Upload your own Excel workbook, or use the example dataset when available.
+
+**2. Format the workbook.** For grouped validation, use sheets named **Raw**, **2nd derivative**, and optionally **Quant peak ratios**. In spectral sheets, include **Sample ID** (independent specimen), **Type** (class label), and numeric wavenumber columns such as **800**, **802**, **804**, ... **1800**, with one spectrum per row. The derivative sheet uses the same ID/label layout. The quantitative sheet uses Sample ID, Type, and numeric peak-ratio features. Keep each specimen's class label consistent.
+
+**3. Run analysis.** Choose preprocessing, classification, PCA, PLS-DA, or SHAP. For leakage-aware validation, enable **Sample-ID Grouped Cross-Validation** in the sidebar, choose a sheet, models, random seed, and spectra per group, then run validation.
+
+**4. Download results.** Export tables and figures in the relevant sections. Large grouped-validation and SHAP jobs may take longer on free hosting.
+
+**Compatibility note:** Some existing workflows assume WT/OIM labels and predefined bone spectral regions. New datasets should be checked for compatible class labels, sheet names and wavenumber coverage.
+        """)
+    _source_options = ["Upload your own Excel file"]
+    if _example_path.is_file():
+        _source_options.insert(0, "Use example dataset")
+    _data_source = st.radio("Choose a dataset", _source_options, horizontal=True, key="bonespec_data_source")
+    if _data_source == "Use example dataset":
+        uploaded_file = _example_io.BytesIO(_example_path.read_bytes())
+        uploaded_file.name = _example_path.name
+        st.success("Example dataset loaded.")
+    else:
+        uploaded_file = st.file_uploader("**Upload FTIR Excel file (.xlsx)**", type=["xlsx"])
+    if not _example_path.is_file():
+        st.caption("Example dataset becomes available after an approved shareable workbook is added to sample_data/bone_spectra_example.xlsx.")
 
 
     if uploaded_file:
@@ -7324,7 +7353,7 @@ from sklearn.base import clone
 
 st.sidebar.markdown("---")
 show_professor_panel = st.sidebar.checkbox(
-    "🧪 Professor's Sample-ID Grouped Validation (NEW)",
+    "🧪 Sample-ID Grouped Cross-Validation",
     value=False,
     help="Reviewer-requested validation: 250 spectra per Sample ID + Leave-One-Group-Out CV grouped by Sample ID.",
 )
@@ -7873,7 +7902,7 @@ if show_professor_panel:
                     lr_zero_sheets.append(f"{sheet_name} / {region_key}")
 
         ws_sum.merge_cells("A1:F1")
-        ws_sum["A1"] = "Sample-ID Grouped Leave-One-Group-Out Validation — Summary for Professor"
+        ws_sum["A1"] = "Sample-ID Grouped Leave-One-Group-Out Validation — Summary"
         _style(ws_sum["A1"], font=Font(name=FONT_NAME, bold=True, size=14, color="FFFFFF"), fill=TITLE_FILL, align=LEFT, border=False)
         ws_sum.row_dimensions[1].height = 24
 
@@ -9211,7 +9240,7 @@ if show_professor_panel:
     )
 
     if _pv_uploaded is None:
-        st.info("Upload the revised WT/OIM Excel file containing the Sample ID column to begin.")
+        st.info("Upload an Excel workbook with sample IDs and class labels to begin.")
     else:
         _pv_xls = pd.ExcelFile(_pv_uploaded)
         _pv_sheet_names = [s for s in _pv_xls.sheet_names if s in _SHEET_KIND]
@@ -9234,7 +9263,7 @@ if show_professor_panel:
                 st.error(str(e))
 
             if _pv_ready:
-                st.sidebar.markdown("**Professor validation settings**")
+                st.sidebar.markdown("**Grouped validation settings**")
                 _pv_n_per_animal = int(st.sidebar.number_input("Spectra per Sample ID", 50, 2000, 250, step=50, key="pv_n"))
                 _pv_seed = int(st.sidebar.number_input("Random seed", 0, 10_000, 42, step=1, key="pv_seed"))
                 _pv_available_models = [m for m in _MODEL_ORDER if m != "XGBoost" or HAS_XGB]
@@ -9404,8 +9433,8 @@ if show_professor_panel:
                     )
                 with _pv_col3:
                     st.download_button(
-                        "📥 Download Professor_Comparison_Tables.xlsx", data=st.session_state["pv_comparison_xlsx"],
-                        file_name=f"Professor_Comparison_Tables_{_pv_run_ts}.xlsx",
+                        "📥 Download Grouped_Validation_Comparison.xlsx", data=st.session_state["pv_comparison_xlsx"],
+                        file_name=f"Grouped_Validation_Comparison_{_pv_run_ts}.xlsx",
                         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                         key="pv_dl3"
                     )
@@ -9507,7 +9536,7 @@ if show_professor_panel:
                     st.download_button(
                         "📥 Download master 12-plot editable Excel workbook",
                         data=st.session_state["pv_12plot_master_xlsx"],
-                        file_name=f"Professor_12_Plot_PCA_PLSDA_Editable_{st.session_state.get('pv_12plot_timestamp','run')}.xlsx",
+                        file_name=f"PCA_PLSDA_Editable_Figures_{st.session_state.get('pv_12plot_timestamp','run')}.xlsx",
                         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                         key="pv_download_12plot_master",
                     )
@@ -9782,7 +9811,7 @@ if show_professor_panel:
                     st.download_button(
                         "📦 Download all publication diagrams (ZIP)",
                         data=st.session_state["pv_figure_zip"],
-                        file_name=f"Professor_Publication_Figures_{st.session_state.get('pv_figure_timestamp', 'run')}.zip",
+                        file_name=f"Spectral_Analysis_Figures_{st.session_state.get('pv_figure_timestamp', 'run')}.zip",
                         mime="application/zip",
                         key="pv_download_all_figures",
                     )
@@ -11004,7 +11033,7 @@ def _zs_fig_waterfall(phi, names, base, title):
 # ------------------------------- START: Streamlit section ------------------------------------
 st.sidebar.markdown("---")                       # Divider from the sections above
 _zs_show = st.sidebar.checkbox(                  # This section is opt-in and off by default
-    "🧭 Spectral Zone-Based SHAP (NEW)",
+    "🧭 Spectral Zone-Based SHAP",
     value=False,
     help="Grouped-feature SHAP following Contreras et al., Anal. Chem. 2024, plus fully editable "
          "full-spectrum SHAP tables. Does not affect any existing result.",
@@ -11033,7 +11062,7 @@ if _zs_show:                                     # Everything below runs only wh
                                  help="Zone analysis needs a wavenumber axis, so the peak-ratio "
                                       "sheet does not apply.")
         _zs_n = int(st.number_input(
-            "Spectra per animal (TRAINING - the professor's 250)", 50, 2000, 250, 50, key="zs_n",
+            "Training spectra per sample group", 50, 2000, 250, 50, key="zs_n",
             help="The balanced design from the 1 June 2026 request. Each model is trained on "
                  "this many spectra from each of the 11 training animals in every fold. Leave "
                  "at 250 to match the accuracy table and every other result in the paper."))
@@ -11550,7 +11579,7 @@ def _q2a_figure(df_bal, ratio_cols, label_col, id_col):
 
 st.sidebar.markdown("---")                        # Divider from the sections above
 _q2a_show = st.sidebar.checkbox(                  # Opt-in, off by default
-    "📊 Fig 2a — Conventional peak-ratio parameters (NEW)",
+    "📊 Conventional Peak-Ratio Analysis",
     value=False,
     help="The standard quantitative analysis panel: each peak ratio compared between WT and OIM, "
          "on the same balanced 250-spectra-per-animal dataset.")
