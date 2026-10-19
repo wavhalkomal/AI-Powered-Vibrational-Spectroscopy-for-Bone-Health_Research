@@ -445,6 +445,24 @@ if st.session_state.page == "user_manual":
     # Do not execute heavy analysis modules while browsing documentation.
     st.stop()
 
+# Shared data source picker for all Excel inputs.
+import io as _dataset_io
+from pathlib import Path as _dataset_pathlib
+
+def _bonespec_select_workbook(label: str, key: str):
+    """Return uploaded Excel or a file-like copy of the optional built-in data.xlsx."""
+    _builtin = _dataset_pathlib(__file__).resolve().parent / "data.xlsx"
+    _choices = ["Upload your own Excel file"]
+    if _builtin.is_file():
+        _choices.insert(0, "Use built-in data.xlsx")
+    _choice = st.radio("Data source", _choices, horizontal=True, key=f"{key}_source")
+    if _choice == "Use built-in data.xlsx":
+        _buffer = _dataset_io.BytesIO(_builtin.read_bytes())
+        _buffer.name = "data.xlsx"
+        st.caption("Using built-in data.xlsx")
+        return _buffer
+    return st.file_uploader(label, type=["xlsx"], key=key)
+
 # ======================= MAIN PAGE ==========================
 if "page" not in st.session_state:
     st.session_state.page = "home"
@@ -478,13 +496,9 @@ elif st.session_state.page == "analysis":
 
     ####################################### [ Upload the document ] #######################################
 
-    # Add only a professor-approved shareable example at sample_data/bone_spectra_example.xlsx.
-    import io as _example_io
-    from pathlib import Path as _ExamplePath
-    _example_path = _ExamplePath(__file__).resolve().parent / "sample_data" / "bone_spectra_example.xlsx"
     with st.expander("📘 User guide — getting started and Excel format", expanded=True):
         st.markdown("""
-**1. Choose your data.** Upload your own Excel workbook, or use the example dataset when available.
+**1. Choose your data.** Upload your own Excel workbook, or choose the built-in data.xlsx workbook when available.
 
 **2. Format the workbook.** For grouped validation, use sheets named **Raw**, **2nd derivative**, and optionally **Quant peak ratios**. In spectral sheets, include **Sample ID** (independent specimen), **Type** (class label), and numeric wavenumber columns such as **800**, **802**, **804**, ... **1800**, with one spectrum per row. The derivative sheet uses the same ID/label layout. The quantitative sheet uses Sample ID, Type, and numeric peak-ratio features. Keep each specimen's class label consistent.
 
@@ -494,18 +508,7 @@ elif st.session_state.page == "analysis":
 
 **Compatibility note:** Some existing workflows assume WT/OIM labels and predefined bone spectral regions. New datasets should be checked for compatible class labels, sheet names and wavenumber coverage.
         """)
-    _source_options = ["Upload your own Excel file"]
-    if _example_path.is_file():
-        _source_options.insert(0, "Use example dataset")
-    _data_source = st.radio("Choose a dataset", _source_options, horizontal=True, key="bonespec_data_source")
-    if _data_source == "Use example dataset":
-        uploaded_file = _example_io.BytesIO(_example_path.read_bytes())
-        uploaded_file.name = _example_path.name
-        st.success("Example dataset loaded.")
-    else:
-        uploaded_file = st.file_uploader("**Upload FTIR Excel file (.xlsx)**", type=["xlsx"])
-    if not _example_path.is_file():
-        st.caption("Example dataset becomes available after an approved shareable workbook is added to sample_data/bone_spectra_example.xlsx.")
+    uploaded_file = _bonespec_select_workbook("**Upload FTIR Excel file (.xlsx)**", "main_excel_upload")
 
 
     if uploaded_file:
@@ -9280,8 +9283,8 @@ if show_professor_panel:
                 zf.writestr(f"{name}.svg", _svg.getvalue())       # Add the SVG next to the PNG
         return out.getvalue()
 
-    _pv_uploaded = st.file_uploader(
-        "Upload the Excel file with Sample IDs (Sample ID column)", type=["xlsx"], key="pv_uploader"
+    _pv_uploaded = _bonespec_select_workbook(
+        "Upload the Excel file with Sample IDs (Sample ID column)", "pv_uploader"
     )
 
     if _pv_uploaded is None:
@@ -11102,7 +11105,7 @@ if _zs_show:                                     # Everything below runs only wh
 
     with st.sidebar:                             # This section's own controls
         st.markdown("**Zone SHAP settings**")    # Sub-heading
-        _zs_up = st.file_uploader("Dataset (.xlsx)", type=["xlsx"], key="zs_upload")
+        _zs_up = _bonespec_select_workbook("Dataset (.xlsx)", "zs_upload")
         _zs_sheet = st.selectbox("Sheet", ["Raw", "2nd derivative"], key="zs_sheet",
                                  help="Zone analysis needs a wavenumber axis, so the peak-ratio "
                                       "sheet does not apply.")
@@ -11637,7 +11640,7 @@ if _q2a_show:
                "Uses the same balanced design as every other figure, so it is directly comparable.")
 
     with st.sidebar:
-        _q2a_up = st.file_uploader("Dataset (.xlsx)", type=["xlsx"], key="q2a_up")
+        _q2a_up = _bonespec_select_workbook("Dataset (.xlsx)", "q2a_up")
         _q2a_n = int(st.number_input("Spectra per animal", 50, 2000, 250, 50, key="q2a_n"))
         _q2a_seed = int(st.number_input("Random seed", 0, 10000, 42, 1, key="q2a_seed"))
         _q2a_go = st.button("▶️ Generate peak-ratio analysis", type="primary", key="q2a_go")
