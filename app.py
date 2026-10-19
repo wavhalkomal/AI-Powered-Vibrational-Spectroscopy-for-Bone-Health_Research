@@ -281,7 +281,7 @@ def inject_shell():
     place-items: center;
   }}
  
-  .hero h1 {{ color: white; text-shadow: 0 10px 30px rgba(0,0,0,.40); font-size: clamp(2.6rem, 5vw, 5.4rem); font-weight: 900; line-height: 1.08; letter-spacing: -1.5px; max-width: 1100px; margin: 0 auto; }}
+  .hero h1 {{ color: white; text-shadow: 0 10px 30px rgba(0,0,0,.40); font-size: 56px; font-weight: 800; line-height: 1.18; letter-spacing: normal; margin: 0; }}
   .hero p {{ color: #eef2ff; margin-top: 10px; font-weight: 600; letter-spacing:.2px; }}
 
   /* Floating Back-to-Top */
