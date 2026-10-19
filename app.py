@@ -170,7 +170,8 @@ _hero_asset = _find_bonespec_hero()
 # Alternative background retained for future reference:
 # https://www.shutterstock.com/image-vector/futuristic-medical-cybernetic-robotics-technology-260nw-2262212371.jpg
 # Previous background URL retained for reference: https://png.pngtree.com/thumb_back/fw800/background/20260620/pngtree-abstract-blue-digital-dna-strand-medical-technology-background-image_21942756.webp
-hero_url = "https://img.magnific.com/free-vector/low-poly-techno-banner_1048-11799.jpg?semt=ais_hybrid&w=740&q=80"
+# Previous background (retained for reference): https://img.magnific.com/free-vector/low-poly-techno-banner_1048-11799.jpg?semt=ais_hybrid&w=740&q=80
+hero_url = "https://auriga.com/wp-content/uploads/2022/07/machine-learning-neural-networks.jpg"
 paper_url = path_to_css_url(PAPER_IMAGE_PATH, PAPER_FALLBACK_URL)
 
 # -------------------- Accent map --------------------
