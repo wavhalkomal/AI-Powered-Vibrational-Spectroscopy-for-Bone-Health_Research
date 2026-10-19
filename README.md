@@ -300,7 +300,7 @@ Interactive plots and downloadable research reports
 ### Repository entrypoint
 
 ```text
-app_k_PROFESSOR_250_FULL_RESULTS_FINAL.py
+app.py
 ```
 
 The application is currently maintained primarily as a large Streamlit Python script. A future modularization may separate the UI, preprocessing, models, grouped validation, and explainability into individually tested packages; **that refactor is a future improvement, not a claim about the current codebase**.
@@ -314,7 +314,7 @@ runtime.txt
 .gitignore
 .streamlit/config.toml
 DEPLOYMENT.md
-app_k_PROFESSOR_250_FULL_RESULTS_FINAL.py
+app.py
 ```
 
 Additional source files or assets may be present in the repository. Some image references in the application (such as `assets/hero.jpg`, `assets/paper.png`, and `Background_1.jpg`) need to be checked during deployment.
@@ -351,7 +351,7 @@ python -m pip install -r requirements.txt
 Launch the application:
 
 ```bash
-streamlit run app_k_PROFESSOR_250_FULL_RESULTS_FINAL.py
+streamlit run app.py
 ```
 
 Streamlit will provide a local browser URL, typically `http://localhost:8501`.
@@ -372,7 +372,7 @@ Use the following configuration:
 | --- | --- |
 | Repository | `wavhalkomal/AI-Powered-Vibrational-Spectroscopy-for-Bone-Health_Research` |
 | Branch | `main` |
-| App file | `app_k_PROFESSOR_250_FULL_RESULTS_FINAL.py` |
+| App file | `app.py` |
 | Dependencies | `requirements.txt` |
 
 Deploy at [Streamlit Community Cloud](https://share.streamlit.io/).
