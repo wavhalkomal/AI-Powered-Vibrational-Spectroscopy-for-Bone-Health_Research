@@ -163,10 +163,9 @@ def _find_bonespec_hero():
     return None
 
 _hero_asset = _find_bonespec_hero()
-if _hero_asset is None:
-    st.warning("BoneSpec AI background image is missing from the deployed repository. "
-               "Upload Background_1.jpg alongside app.py (or into assets/) on the main branch.")
-hero_url = path_to_css_url(_hero_asset, HERO_FALLBACK_URL) if _hero_asset else HERO_FALLBACK_URL
+
+# User-selected remote DNA background: use directly rather than requiring a GitHub image upload.
+hero_url = "https://png.pngtree.com/thumb_back/fw800/background/20260620/pngtree-abstract-blue-digital-dna-strand-medical-technology-background-image_21942756.webp"
 paper_url = path_to_css_url(PAPER_IMAGE_PATH, PAPER_FALLBACK_URL)
 
 # -------------------- Accent map --------------------
