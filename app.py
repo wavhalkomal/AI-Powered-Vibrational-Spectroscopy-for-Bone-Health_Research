@@ -106,7 +106,9 @@ HERO_IMAGE_PATH = "assets/hero.jpg"   # e.g., "assets/hero.jpg" or a full URL
 PAPER_IMAGE_PATH = "assets/paper.png" # e.g., "assets/paper.png" or a full URL
 # -------------------- Image paths (local file paths or URLs) --------------------
 # Use your local DNA image (downloaded and saved as Background_1.jpg in your project folder)
-HERO_DEFAULT = "Background_1.jpg"     # ← local image file
+from pathlib import Path
+BASE_DIR = Path(__file__).resolve().parent
+HERO_DEFAULT = str(BASE_DIR / "Background_1.jpg")  # Resolve relative to app.py
 PAPER_IMAGE_PATH = "assets/paper.png" # optional page wallpaper
 
 # Fallback URLs if local files are missing
